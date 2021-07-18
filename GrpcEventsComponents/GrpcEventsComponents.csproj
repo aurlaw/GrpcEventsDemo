@@ -19,6 +19,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Protobuf Include="..\Protos\broadcast.proto" GrpcServices="Client">
+      <Link>Protos\broadcast.proto</Link>
+    </Protobuf>
     <Protobuf Include="..\Protos\weather.proto" GrpcServices="Client">
       <Link>Protos\weather.proto</Link>
     </Protobuf>

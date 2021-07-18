@@ -1,7 +1,7 @@
 ﻿using System;
 using Grpc.Net.Client;
 
-namespace GrpcEventsClient
+namespace GrpcEventsComponents
 {
 	public class ClientBase
 	{

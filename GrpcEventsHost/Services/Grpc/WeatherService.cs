@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Easy.MessageHub;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using GrpcEventsHost.Models;
 using GrpcService.Protos;
 using Microsoft.Extensions.Logging;
 
@@ -10,64 +12,68 @@ namespace GrpcEventsHost.Services.Grpc
 	public class WeatherService : WeatherForecasts.WeatherForecastsBase
     {
         private readonly ILogger<WeatherService> _logger;
-        private readonly IMessageService _messageService;
+        private readonly IMessageHub _hub;
 
-		public WeatherService(ILogger<WeatherService> logger, IMessageService messageService)
+
+		public WeatherService(ILogger<WeatherService> logger, IMessageHub hub)
 		{
 			_logger = logger;
-			_messageService = messageService;
+			_hub = hub;
 		}
 
 		public override async Task GetWeatherStream(Empty _, IServerStreamWriter<WeatherData> responseStream, ServerCallContext context)
 		{
             _logger.LogInformation("GetWeatherStream invoked");
-            while(!context.CancellationToken.IsCancellationRequested)
-			{
-                var forecast = new WeatherData();
-                _logger.LogInformation("Sending weather response");
-                await responseStream.WriteAsync(forecast);
-                await Task.Delay(500); //simulate latency
 
-            }
-            if (context.CancellationToken.IsCancellationRequested)
+            var streamToken = _hub.Subscribe<WeatherResult>(result => OnWeatherData(result, responseStream));
+			try
 			{
-                _logger.LogInformation("The client cancelled request");
-            }
+                await context.CancellationToken.WaitUntilCancelled().ConfigureAwait(false);
+			}
+            catch (Exception ex)
+			{
+                _logger.LogError(ex, ex.Message);
+			}
+            finally
+			{
+                _hub.Unsubscribe(streamToken);
+			}
+        }
+
+        private async Task OnWeatherData(WeatherResult weatherResult, IServerStreamWriter<WeatherData> responseStream)
+		{
+            var forecast = new WeatherData
+            {
+                DateTime = Timestamp.FromDateTime(weatherResult.Updated),
+                TemperatureC = weatherResult.Temp,
+                TemperatureF = weatherResult.TempF,
+                Summary = weatherResult.Summary
+            };
+            await responseStream.WriteAsync(forecast);
         }
     }
 }
 /*
-     public class WeatherService : WeatherForecasts.WeatherForecastsBase
+ * 
+ var streamToken = _hub.Subscribe<SnapshotBroadcastWorkItem.Data>(data => onNewData(data, responseStream));
+ * 
+try
     {
-        
-        public override async Task GetWeatherStream(Empty _, IServerStreamWriter<WeatherData> responseStream, ServerCallContext context)
-        {
-            _logger.LogInformation("GetWeatherStream invoked");
-            var max = 20;
-            var i = 0;
-            var now = DateTime.UtcNow;
-            var random = new Random();
-            while(!context.CancellationToken.IsCancellationRequested && i < max)
-            {
-                var forecast = new WeatherData
-                {
-                    DateTime = Timestamp.FromDateTime(now.AddDays(i++)),
-                    TemperatureC = random.Next(-20, 50),
-                    Summary = _summaries[random.Next(_summaries.Length)]
-                };
-                forecast.TemperatureF = (forecast.TemperatureC * 9/5) + 32;
-
-                _logger.LogInformation("Sending weather response");
-                await responseStream.WriteAsync(forecast);
-
-                await Task.Delay(500); //simulate latency
-            }
-            if(context.CancellationToken.IsCancellationRequested)
-            {
-                _logger.LogInformation("The client cancelled request");
-            }   
-        }
-        
+        await context.CancellationToken.WaitUntilCancelled().ConfigureAwait(false);
     }
+    catch (Exception e)
+    {
+        // log me, maybe?
+    }
+    finally
+    {
+        // cleanup
+        _hub.Unsubscribe(streamToken);
+    } * 
+ * 
+private async Task onNewData(SnapshotBroadcastWorkItem.Data data, IServerStreamWriter<StartStreamResponse> responseStream)
+{
+    await responseStream.WriteAsync(data).ConfigureAwait(false);
+}
  
  */

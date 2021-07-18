@@ -10,6 +10,7 @@
     <None Remove="Grpc.AspNetCore" />
     <None Remove="Models\" />
     <None Remove="Services\Grpc\" />
+    <None Remove="Easy.MessageHub" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
@@ -18,8 +19,12 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.38.0" />
+    <PackageReference Include="Easy.MessageHub" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <Protobuf Include="..\Protos\broadcast.proto" GrpcServices="Server">
+      <Link>Protos\broadcast.proto</Link>
+    </Protobuf>
     <Protobuf Include="..\Protos\weather.proto" GrpcServices="Server">
       <Link>Protos\weather.proto</Link>
     </Protobuf>

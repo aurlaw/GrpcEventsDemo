@@ -7,7 +7,7 @@ using static GrpcService.Protos.WeatherForecasts;
 
 namespace GrpcEventsClient
 {
-	public class WeatherClientService : ClientBase
+	public class WeatherClientService : GrpcEventsComponents.ClientBase
 	{ 
 		public WeatherClientService(string baseUrl) : base(baseUrl)
 		{

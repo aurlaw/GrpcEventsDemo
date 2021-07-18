@@ -7,7 +7,7 @@
     "GrpcEventsHost": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:50407",
+      "applicationUrl": "http://localhost:7575",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

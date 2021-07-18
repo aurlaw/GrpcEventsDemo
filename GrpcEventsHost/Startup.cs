@@ -28,7 +28,7 @@ namespace GrpcEventsHost
             {
                 logging.AddConsole();
             });
-
+            services.AddMessageBus();
             services.AddSingleton<IMessageService, MessageService>();
 
 
@@ -46,6 +46,7 @@ namespace GrpcEventsHost
 			app.UseEndpoints(endpoint =>
 			{
                 endpoint.MapGrpcService<WeatherService>();
+                endpoint.MapGrpcService<BroadcastService>();
                 endpoint.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
