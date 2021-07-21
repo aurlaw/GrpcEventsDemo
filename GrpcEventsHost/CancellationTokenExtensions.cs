@@ -22,5 +22,16 @@ namespace GrpcEventsHost
                 await taskCompletionSource.Task.ConfigureAwait(false);
             }
         }
+        
+        public static TaskCompletionSource<object> CreateCancellable(this CancellationToken cancellationToken)
+        {
+            var taskCompletionSource = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+            cancellationToken.Register(state => { ((TaskCompletionSource<object>)state).TrySetResult(null); },
+                                    taskCompletionSource,
+                                    false);
+
+            return taskCompletionSource;
+        }
+
     }
 }
