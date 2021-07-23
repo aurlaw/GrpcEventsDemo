@@ -39,6 +39,10 @@ namespace GrpcEventsHost
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            } 
+            else 
+            {
+                app.UseHttpsRedirection();
             }
 
             app.UseRouting();

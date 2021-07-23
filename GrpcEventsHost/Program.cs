@@ -20,11 +20,15 @@ namespace GrpcEventsHost
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.ConfigureKestrel(options =>
+                    var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                    if(env == "Development") 
                     {
-                        // Setup a HTTP/2 endpoint without TLS. Macos
-                        options.ListenLocalhost(7575, o => o.Protocols = HttpProtocols.Http2);
-                    });                    
+                        webBuilder.ConfigureKestrel(options =>
+                        {
+                            // Setup a HTTP/2 endpoint without TLS. Macos
+                            options.ListenLocalhost(7575, o => o.Protocols = HttpProtocols.Http2);
+                        });                 
+                    }   
                     webBuilder.UseStartup<Startup>();
                 });
 

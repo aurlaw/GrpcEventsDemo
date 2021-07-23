@@ -279,3 +279,10 @@ assets/appiconmaker.co_all
 
 # pupeteer chrome
 .local-chromium
+GrpcEventsHost/sslnote
+GrpcEventsHost/cert.pem
+GrpcEventsHost/key.pem
+GrpcEventsHost/prod.config
+GrpcEventsHost/prod.crt
+GrpcEventsHost/prod.csr.pem
+GrpcEventsHost/prod.key
